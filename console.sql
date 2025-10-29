@@ -1,0 +1,45 @@
+-- Console commands to check that the data is loaded correctly
+-- list all schemas and tables
+SELECT TABLE_SCHEMA, TABLE_NAME
+FROM INFORMATION_SCHEMA.TABLES
+WHERE TABLE_TYPE = 'BASE TABLE';
+
+-- Create user for replication
+CREATE USER replication_user WITH REPLICATION PASSWORD 'password';
+ALTER USER replication_user WITH REPLICATION;
+--  Set replicate identity for all tables
+ALTER TABLE ORDERS REPLICA IDENTITY FULL;
+ALTER TABLE ORDER_DETAILS REPLICA IDENTITY FULL;
+ALTER TABLE CUSTOMERS REPLICA IDENTITY FULL;
+ALTER TABLE EMPLOYEES REPLICA IDENTITY FULL;
+ALTER TABLE SUPPLIERS REPLICA IDENTITY FULL;
+ALTER TABLE categories REPLICA IDENTITY FULL;
+ALTER TABLE customer_demographics REPLICA IDENTITY FULL;
+ALTER TABLE territories REPLICA IDENTITY FULL;
+ALTER TABLE region REPLICA IDENTITY FULL;
+ALTER TABLE us_states REPLICA IDENTITY FULL;
+ALTER TABLE products REPLICA IDENTITY FULL;
+ALTER TABLE shippers REPLICA IDENTITY FULL;
+ALTER TABLE employee_territories REPLICA IDENTITY FULL;
+ALTER TABLE customer_customer_demo REPLICA IDENTITY FULL;
+
+-- Check the data
+SELECT * FROM ORDERS
+ORDER BY order_id LIMIT 5;
+
+SELECT *
+FROM ORDER_DETAILS
+WHERE PRODUCT_ID = 77
+LIMIT 5;
+
+-- Run an update to obtain some changes
+-- Add Waffles
+UPDATE orders O
+SET
+    order_date = MAKE_DATE(1997, 11, 01),
+    required_date = MAKE_DATE(1997, 11, 05),
+    shipped_date = MAKE_DATE(1997, 11, 02)
+FROM order_details OD
+WHERE O.order_id = OD.order_id
+  AND OD.product_id = 78
+  AND O.order_date >= CURRENT_DATE - INTERVAL '7 days';
