@@ -8,3 +8,12 @@ wheels/
 
 # Virtual environments
 .venv
+
+# Secrets & credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+credentials.json
+.streamlit/secrets.toml
